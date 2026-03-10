@@ -3386,15 +3386,10 @@ Only recommend cards appropriate for their credit score. Prioritize their stated
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 20000);
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model:"claude-sonnet-4-6",
-          max_tokens:1000,
-          messages:[{ role:"user", content:buildPrompt() }],
-        }),
+      const response = await fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: yourPromptVariable }),
       });
       clearTimeout(timeout);
       if (!response.ok) {
