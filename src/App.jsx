@@ -3653,7 +3653,7 @@ export default function App({ session, supabase }) {
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:12 }}>
           <span style={{ fontSize:11, color:'#4a4840' }}>
-            {session.user.email}
+            {session.user.user_metadata?.given_name || session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email}
           </span>
           <button
             onClick={() => supabase.auth.signOut()}
