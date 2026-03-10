@@ -16,7 +16,7 @@ export function useUserData(supabase, userId) {
       .from('user_preferences')
       .select('*')
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()        // ← was .single()
     setPreferences(data || {})
     setLoading(false)
   }
