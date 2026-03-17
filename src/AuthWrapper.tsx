@@ -1,23 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
+import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 
-export default function AuthWrapper({ children }) {
-  const [session, setSession] = useState(null)
+interface RenderProps {
+  session: Session | null;
+  supabase: SupabaseClient;
+}
+
+interface Props {
+  children: (props: RenderProps) => ReactNode;
+  /** When true the component renders children even without an active session */
+  allowGuest?: boolean;
+}
+
+export default function AuthWrapper({ children, allowGuest = false }: Props) {
+  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get current session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setLoading(false)
     })
 
-    // Listen for auth state changes (login, logout, token refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => setSession(session)
-    )
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
 
     return () => subscription.unsubscribe()
   }, [])
@@ -27,9 +37,14 @@ export default function AuthWrapper({ children }) {
       <div style={{ minHeight:'100vh', background:'#0a0a0f', display:'flex',
         alignItems:'center', justifyContent:'center', color:'#d4af37',
         fontFamily:'serif', fontSize:18, letterSpacing:'0.1em' }}>
-        Loading...
+        Loading…
       </div>
     )
+  }
+
+  // Guest mode: render the app with session=null so public routes work
+  if (allowGuest && !session) {
+    return <>{children({ session: null, supabase })}</>
   }
 
   if (!session) {
@@ -60,9 +75,9 @@ export default function AuthWrapper({ children }) {
                     defaultButtonBackground: '#1a1a28',
                     defaultButtonBorder: 'rgba(212,175,55,0.2)',
                     defaultButtonText: '#e8e0d0',
-                  }
-                }
-              }
+                  },
+                },
+              },
             }}
             providers={['google']}
             onlyThirdPartyProviders={true}
@@ -77,6 +92,5 @@ export default function AuthWrapper({ children }) {
     )
   }
 
-  // Pass session and supabase client down to the app
-  return children({ session, supabase })
+  return <>{children({ session, supabase })}</>
 }
