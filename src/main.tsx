@@ -8,7 +8,7 @@ import App from './App'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthWrapper allowGuest={true}>
+      <AuthWrapper>
         {({ session, supabase }) => <App session={session} supabase={supabase} />}
       </AuthWrapper>
     </BrowserRouter>

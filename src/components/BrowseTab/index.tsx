@@ -75,6 +75,7 @@ export default function BrowseTab({ cardDB }: Props) {
   }
 
   return (
+    <main style={{ maxWidth:860, margin:"0 auto", padding:"52px 40px 80px" }}>
     <div className="fade-up">
       {selectedCard && <CardModal card={selectedCard} onClose={closeCard} />}
 
@@ -174,5 +175,6 @@ export default function BrowseTab({ cardDB }: Props) {
         ))}
       </div>
     </div>
+    </main>
   )
 }
